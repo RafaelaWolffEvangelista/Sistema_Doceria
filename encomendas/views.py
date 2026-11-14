@@ -4,6 +4,8 @@ from decimal import Decimal
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.db.models import Count, Sum, Case, When, DecimalField, Value
+from django.db.models.functions import TruncMonth
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import (
@@ -12,7 +14,7 @@ from .forms import (
     ItemEncomendaProdutoFormSet,
     ItemEncomendaKitFormSet,
 )
-from .models import Encomenda
+from .models import Encomenda, ItemEncomendaProduto, ItemEncomendaKit
 
 
 def calcular_total(produtos_formset, kits_formset):
@@ -41,11 +43,36 @@ def calcular_total(produtos_formset, kits_formset):
 def listar(request):
     encomendas = Encomenda.objects.all().order_by('-data_criacao')
 
+    status = request.GET.get('status', '')
+    data_inicio = request.GET.get('data_inicio', '')
+    data_fim = request.GET.get('data_fim', '')
+
+    if status:
+        encomendas = encomendas.filter(status=status)
+
+    if data_inicio:
+        encomendas = encomendas.filter(
+            data_criacao__date__gte=data_inicio
+        )
+
+    if data_fim:
+        encomendas = encomendas.filter(
+            data_criacao__date__lte=data_fim
+        )
+
+    context = {
+        'encomendas': encomendas,
+        'status_selecionado': status,
+        'data_inicio': data_inicio,
+        'data_fim': data_fim,
+    }
+
     return render(
         request,
         'encomendas/pages/listar.html',
-        {'encomendas': encomendas}
+        context
     )
+
 
 
 @login_required(login_url='administradora:login')
@@ -230,3 +257,122 @@ def cancelar(request, id):
     )
 
     return redirect('encomendas:listar')
+
+
+@login_required(login_url='administradora:login')
+def relatorios(request):
+    encomendas = Encomenda.objects.all()
+
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+
+    if data_inicio:
+        encomendas = encomendas.filter(
+            data_criacao__date__gte=data_inicio
+        )
+
+    if data_fim:
+        encomendas = encomendas.filter(
+            data_criacao__date__lte=data_fim
+        )
+
+    totais_status = encomendas.values('status').annotate(
+        quantidade=Count('id')
+    ).order_by('status')
+
+    total_encomendas = encomendas.count()
+
+    faturamento = encomendas.filter(
+        status='Concluida'
+    ).aggregate(
+        total=Sum('valor_total')
+    )['total'] or Decimal('0.00')
+
+    encomendas_concluidas = encomendas.filter(
+        status='Concluida'
+    )
+
+    produtos_mais_vendidos = ItemEncomendaProduto.objects.filter(
+        encomenda__in=encomendas_concluidas
+    ).values(
+        'produto__nome'
+    ).annotate(
+        quantidade_vendida=Sum('quantidade')
+    ).order_by('-quantidade_vendida')[:10]
+
+    kits_mais_vendidos = ItemEncomendaKit.objects.filter(
+        encomenda__in=encomendas_concluidas
+    ).values(
+        'kit__nome'
+    ).annotate(
+        quantidade_vendida=Sum('quantidade')
+    ).order_by('-quantidade_vendida')[:10]
+
+    vendas_mensais = encomendas_concluidas.annotate(
+        mes=TruncMonth('data_criacao')
+    ).values(
+        'mes'
+    ).annotate(
+        quantidade=Count('id'),
+        faturamento=Sum('valor_total')
+    ).order_by('mes')
+
+    vendas_pivot = encomendas.annotate(
+        mes=TruncMonth('data_criacao')
+    ).values(
+        'mes'
+    ).annotate(
+        pendente=Sum(
+            Case(
+                When(status='Pendente', then='valor_total'),
+                default=Value(0),
+                output_field=DecimalField()
+            )
+        ),
+        em_producao=Sum(
+            Case(
+                When(status='Em Producao', then='valor_total'),
+                default=Value(0),
+                output_field=DecimalField()
+            )
+        ),
+        pronto=Sum(
+            Case(
+                When(status='Pronto', then='valor_total'),
+                default=Value(0),
+                output_field=DecimalField()
+            )
+        ),
+        concluida=Sum(
+            Case(
+                When(status='Concluida', then='valor_total'),
+                default=Value(0),
+                output_field=DecimalField()
+            )
+        ),
+        cancelada=Sum(
+            Case(
+                When(status='Cancelada', then='valor_total'),
+                default=Value(0),
+                output_field=DecimalField()
+            )
+        )
+    ).order_by('mes')
+
+    context = {
+        'total_encomendas': total_encomendas,
+        'totais_status': totais_status,
+        'faturamento': faturamento,
+        'produtos_mais_vendidos': produtos_mais_vendidos,
+        'kits_mais_vendidos': kits_mais_vendidos,
+        'vendas_mensais': vendas_mensais,
+        'vendas_pivot': vendas_pivot,
+        'data_inicio': data_inicio,
+        'data_fim': data_fim,
+    }
+
+    return render(
+        request,
+        'encomendas/pages/relatorios.html',
+        context
+    )
