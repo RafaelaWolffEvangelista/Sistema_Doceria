@@ -25,9 +25,7 @@ from .forms import CadastroClienteForm
 from .models import PerfilCliente
 
 
-# ============================================================
-# FUNÇÕES AUXILIARES DO CARRINHO
-# ============================================================
+
 
 def _chave_kit(kit_id):
     return f'kit_{kit_id}'
@@ -42,9 +40,6 @@ def _obter_quantidade(valor):
     return quantidade
 
 
-# ============================================================
-# PÁGINA INICIAL
-# ============================================================
 
 def home(request):
     categorias = Categoria.objects.filter(ativo=True)
@@ -56,9 +51,6 @@ def home(request):
     return render(request, 'home.html', context)
 
 
-# ============================================================
-# CATÁLOGO DE PRODUTOS
-# ============================================================
 
 def catalogo(request):
     categorias = Categoria.objects.filter(ativo=True)
@@ -106,9 +98,6 @@ def catalogo(request):
     return render(request, 'catalogo.html', context)
 
 
-# ============================================================
-# DETALHES DO PRODUTO
-# ============================================================
 
 def detalhe_produto(request, slug):
     produto = get_object_or_404(
@@ -124,9 +113,7 @@ def detalhe_produto(request, slug):
     )
 
 
-# ============================================================
-# KITS DISPONÍVEIS PARA O CLIENTE
-# ============================================================
+
 
 def kits_cliente(request):
     kits = Kit.objects.filter(
@@ -140,9 +127,7 @@ def kits_cliente(request):
     return render(request, 'kits_cliente.html', context)
 
 
-# ============================================================
-# DETALHES DE UM KIT
-# ============================================================
+
 
 def detalhe_kit_cliente(request, slug):
     kit = get_object_or_404(
@@ -158,9 +143,7 @@ def detalhe_kit_cliente(request, slug):
     return render(request, 'kit_detalhe_cliente.html', context)
 
 
-# ============================================================
-# ADICIONAR PRODUTO AO CARRINHO
-# ============================================================
+
 
 @require_POST
 def adicionar_carrinho(request, produto_id):
@@ -215,9 +198,7 @@ def adicionar_carrinho(request, produto_id):
     )
 
 
-# ============================================================
-# ADICIONAR KIT AO MESMO CARRINHO DOS PRODUTOS
-# ============================================================
+
 
 @require_POST
 def adicionar_kit_carrinho(request, kit_id):
@@ -262,10 +243,8 @@ def adicionar_kit_carrinho(request, kit_id):
     )
 
 
-# ============================================================
-# EXIBIR CARRINHO COM PRODUTOS E KITS
-# ============================================================
 
+#EXIBIR KIT E PRODUTOS JUNTOS NO CARRINHO
 def carrinho(request):
     carrinho_sessao = request.session.get('carrinho', {})
 
@@ -351,9 +330,7 @@ def carrinho(request):
     return render(request, 'carrinho.html', context)
 
 
-# ============================================================
-# ATUALIZAR QUANTIDADE DE PRODUTO
-# ============================================================
+
 
 @require_POST
 def atualizar_carrinho(request, produto_id):
@@ -398,9 +375,7 @@ def atualizar_carrinho(request, produto_id):
     return redirect('loja:carrinho')
 
 
-# ============================================================
-# ATUALIZAR QUANTIDADE DE KIT
-# ============================================================
+
 
 @require_POST
 def atualizar_kit_carrinho(request, kit_id):
@@ -441,9 +416,7 @@ def atualizar_kit_carrinho(request, kit_id):
     return redirect('loja:carrinho')
 
 
-# ============================================================
-# REMOVER PRODUTO DO CARRINHO
-# ============================================================
+
 
 @require_POST
 def remover_carrinho(request, produto_id):
@@ -464,9 +437,7 @@ def remover_carrinho(request, produto_id):
     return redirect('loja:carrinho')
 
 
-# ============================================================
-# REMOVER KIT DO CARRINHO
-# ============================================================
+
 
 @require_POST
 def remover_kit_carrinho(request, kit_id):
@@ -487,9 +458,7 @@ def remover_kit_carrinho(request, kit_id):
     return redirect('loja:carrinho')
 
 
-# ============================================================
-# ESVAZIAR CARRINHO
-# ============================================================
+
 
 @require_POST
 def limpar_carrinho(request):
@@ -501,9 +470,7 @@ def limpar_carrinho(request):
     return redirect('loja:carrinho')
 
 
-# ============================================================
-# CADASTRO DO CLIENTE
-# ============================================================
+
 
 def cadastro_cliente(request):
     if request.user.is_authenticated:
@@ -547,9 +514,7 @@ def cadastro_cliente(request):
     )
 
 
-# ============================================================
-# LOGIN DO CLIENTE
-# ============================================================
+
 
 def login_cliente(request):
     if request.user.is_authenticated:
@@ -598,9 +563,7 @@ def login_cliente(request):
     return render(request, 'login.html')
 
 
-# ============================================================
-# LOGOUT DO CLIENTE
-# ============================================================
+
 
 def logout_cliente(request):
     if request.user.is_authenticated and hasattr(
@@ -612,9 +575,7 @@ def logout_cliente(request):
     return redirect('loja:home')
 
 
-# ============================================================
-# FINALIZAR PEDIDO COM PRODUTOS E KITS
-# ============================================================
+
 
 def finalizar_pedido(request):
     if not request.user.is_authenticated:
@@ -827,7 +788,7 @@ def finalizar_pedido(request):
                 return redirect(
                     'https://wa.me/5565998047155?text='
                     + quote(mensagem)
-                )
+                ) #REDIRECIONA PARA O WHATSAPP 
 
         except (ValueError, TypeError):
             messages.error(
@@ -856,9 +817,6 @@ def finalizar_pedido(request):
     )
 
 
-# ============================================================
-# MEUS PEDIDOS
-# ============================================================
 
 def meus_pedidos(request):
     if not request.user.is_authenticated:
@@ -889,9 +847,7 @@ def meus_pedidos(request):
     )
 
 
-# ============================================================
-# CANCELAR PEDIDO
-# ============================================================
+
 
 @require_POST
 def cancelar_meu_pedido(request, encomenda_id):
