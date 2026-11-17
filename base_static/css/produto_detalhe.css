@@ -222,3 +222,55 @@
         width: 100%;
     }
 }
+
+
+/* =====================================
+   NOTIFICAÇÃO DE SUCESSO - CARRINHO
+===================================== */
+
+.notificacoes-produto {
+    width: 100%;
+    margin-bottom: 20px;
+    animation: aparecerSucesso 0.25s ease;
+}
+
+.notificacao-sucesso {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    border: 1px solid #a8d8b5;
+    border-radius: 9px;
+    background-color: #edf9f0;
+    color: #246b3b;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.icone-sucesso {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 23px;
+    height: 23px;
+    border-radius: 50%;
+    background-color: #2e9b52;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+@keyframes aparecerSucesso {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

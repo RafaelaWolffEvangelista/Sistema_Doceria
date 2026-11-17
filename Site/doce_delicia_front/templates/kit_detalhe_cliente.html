@@ -1,0 +1,207 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ kit.nome }} | Doce Delícia{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/produto_detalhe.css' %}">
+
+<style>
+    .kit-produtos {
+        margin-top: 30px;
+        width: 100%;
+    }
+
+    .kit-produtos h2 {
+        margin-bottom: 18px;
+        color: var(--color-primary);
+    }
+
+    .kit-produtos-lista {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+    }
+
+    .kit-produto {
+        background: #fff;
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        padding: 12px;
+        text-align: center;
+    }
+
+    .kit-produto img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .kit-produto .sem-imagem {
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 35px;
+        background: #F5EAE4;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .kit-produto h3 {
+        font-size: 15px;
+        margin-bottom: 5px;
+    }
+
+    .kit-produto p {
+        font-size: 13px;
+        color: var(--color-text);
+    }
+
+    .kit-acoes {
+        margin-top: 20px;
+    }
+
+    .kit-acoes input {
+        max-width: 100px;
+        margin: 10px 0 15px;
+    }
+
+    .kit-mensagem {
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        background: #f5eae4;
+        color: #6b3d32;
+    }
+
+    @media (max-width: 700px) {
+        .kit-produtos-lista {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="produto-detalhe">
+
+    <div class="produto-detalhe-imagem">
+
+        {% if kit.imagem %}
+            <img src="{{ kit.imagem.url }}" alt="{{ kit.nome }}">
+        {% else %}
+            <div class="sem-imagem">
+                🎁
+                <span>Imagem indisponível</span>
+            </div>
+        {% endif %}
+
+    </div>
+
+    {% if messages %}
+        <div class="notificacoes-produto">
+            {% for message in messages %}
+                <div class="notificacao-sucesso" role="status">
+                    <span class="icone-sucesso">✓</span>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="produto-detalhe-info">
+
+        <span class="produto-categoria">
+            Kit especial
+        </span>
+
+        <h1>{{ kit.nome }}</h1>
+
+        <p class="produto-descricao">
+            {{ kit.descricao|linebreaksbr }}
+        </p>
+
+        <p class="produto-preco">
+            R$ {{ kit.preco|floatformat:2 }}
+        </p>
+
+        <form
+            method="post"
+            action="{% url 'loja:adicionar_kit_carrinho' kit.id %}"
+            class="kit-acoes"
+        >
+
+            {% csrf_token %}
+
+            <label for="quantidade">
+                Quantidade de kits:
+            </label>
+
+            <input
+                type="number"
+                name="quantidade"
+                id="quantidade"
+                value="1"
+                min="1"
+                required
+            >
+
+            <button type="submit" class="btn btn-primary">
+                🎁 Adicionar kit ao carrinho
+            </button>
+
+        </form>
+
+        <a href="{% url 'loja:kits' %}" class="btn btn-primary">
+            Voltar aos kits
+        </a>
+
+    </div>
+
+</section>
+
+<section class="kit-produtos">
+
+    <h2>O que vem neste kit? 🍬</h2>
+
+    <div class="kit-produtos-lista">
+
+        {% for produto in kit.produtos.all %}
+
+            <article class="kit-produto">
+
+                {% if produto.imagem %}
+                    <img
+                        src="{{ produto.imagem.url }}"
+                        alt="{{ produto.nome }}"
+                    >
+                {% else %}
+                    <div class="sem-imagem">🍰</div>
+                {% endif %}
+
+                <h3>{{ produto.nome }}</h3>
+
+                {% if produto.descricao %}
+                    <p>{{ produto.descricao|truncatewords:12 }}</p>
+                {% endif %}
+
+            </article>
+
+        {% empty %}
+
+            <p>
+                Os produtos deste kit ainda não foram cadastrados.
+            </p>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endblock %}

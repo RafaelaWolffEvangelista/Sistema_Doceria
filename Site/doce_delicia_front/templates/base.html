@@ -3,59 +3,111 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Doce Delícia{% endblock %}</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'global/css/style.css' %}">
-  {% block extra_css %}{% endblock %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{% block title %}Doce Delícia{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,600&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="{% static 'global/css/style.css' %}">
+
+    {% block extra_css %}{% endblock %}
 </head>
+
 <body class="{% block body_class %}{% endblock %}">
 
 <header class="main-header">
-  <div class="logo-container">
-    <a href="{% url 'loja:home' %}" class="logo-text">
-      🍰 Doce Delícia
-    </a>
-  </div>
 
-  <nav class="main-nav">
-    <a href="{% url 'loja:home' %}">Início</a>
-    <a href="{% url 'loja:catalogo' %}">Catálogo</a>
-    <a href="#">Kits</a>
-    <a href="{% url 'loja:carrinho' %}">Carrinho</a>
+    <div class="logo-container">
+        <a href="{% url 'loja:home' %}" class="logo-text">
+            🍰 Doce Delícia
+        </a>
+    </div>
 
-    {% if user.is_authenticated %}
-      {% if user.perfil_cliente %}
-        <a href="#">Minha Conta</a>
-        <a href="{% url 'loja:meus_pedidos' %}">Meus Pedidos</a>
-        <a href="{% url 'loja:logout' %}">Sair</a>
-      {% else %}
-        <a href="#">Minha Conta</a>
-        <a href="{% url 'administradora:logout' %}">Sair</a>
-      {% endif %}
-    {% else %}
-      <a href="{% url 'loja:login' %}">Entrar</a>
-    {% endif %}
-  </nav>
+    <nav class="main-nav">
+
+        <a href="{% url 'loja:home' %}">Início</a>
+
+        <a href="{% url 'loja:catalogo' %}">Catálogo</a>
+
+        <a href="{% url 'loja:kits' %}">Kits</a>
+
+        <a href="{% url 'loja:carrinho' %}">Carrinho</a>
+
+        {% if user.is_authenticated %}
+
+            {% if user.perfil_cliente %}
+
+                <a href="{% url 'loja:perfil_ver' %}">
+                    Minha Conta
+                </a>
+
+                <a href="{% url 'loja:meus_pedidos' %}">
+                    Meus Pedidos
+                </a>
+
+                <a href="{% url 'loja:logout' %}">
+                    Sair
+                </a>
+
+            {% else %}
+
+                <a href="{% url 'administradora:perfil_ver' %}">
+                    Minha Conta
+                </a>
+
+                <a href="{% url 'administradora:logout' %}">
+                    Sair
+                </a>
+
+            {% endif %}
+
+        {% else %}
+
+            <a href="{% url 'loja:login' %}">
+                Entrar
+            </a>
+
+        {% endif %}
+
+    </nav>
+
 </header>
 
 <main class="main-container">
-  {% if messages %}
-    <ul class="messages">{% for m in messages %}<li class="msg {{ m.tags }}">{{ m }}</li>{% endfor %}</ul>
-  {% endif %}
-  {% block content %}{% endblock %}
+
+    {% if messages %}
+        {% for m in messages %}
+        {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
 </main>
 
 <footer class="main-footer">
-  <p>&copy; 2026 Doce Delícia - Todos os direitos reservados.</p>
-  <small>Sabor que encanta em todos os momentos especiais</small>
+
+    <p>
+        &copy; 2026 Doce Delícia - Todos os direitos reservados.
+    </p>
+
+    <small>
+        Sabor que encanta em todos os momentos especiais
+    </small>
+
 </footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 <script src="{% static 'js/main.js' %}"></script>
+
 {% block extra_js %}{% endblock %}
+
 </body>
 </html>
-

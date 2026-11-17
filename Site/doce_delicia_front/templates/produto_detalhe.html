@@ -23,6 +23,19 @@
         {% endif %}
     </div>
 
+    {% if messages %}
+        <div class="notificacoes-produto">
+            {% for message in messages %}
+                {% if 'success' in message.tags %}
+                    <div class="notificacao-sucesso" role="status">
+                        <span class="icone-sucesso">✓</span>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <div class="produto-detalhe-info">
 
         <span class="produto-categoria">

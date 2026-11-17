@@ -26,21 +26,45 @@
         <div class="item">
 
             <div class="img-slot">
-                {% if item.produto.imagem %}
-                    <img
-                        src="{{ item.produto.imagem.url }}"
-                        alt="{{ item.produto.nome }}"
-                    >
+
+                {% if item.tipo == 'kit' %}
+
+                    {% if item.kit.imagem %}
+                        <img
+                            src="{{ item.kit.imagem.url }}"
+                            alt="{{ item.kit.nome }}"
+                        >
+                    {% else %}
+                        <span>🎁</span>
+                    {% endif %}
+
                 {% else %}
-                    <span>🍰</span>
+
+                    {% if item.produto.imagem %}
+                        <img
+                            src="{{ item.produto.imagem.url }}"
+                            alt="{{ item.produto.nome }}"
+                        >
+                    {% else %}
+                        <span>🍰</span>
+                    {% endif %}
+
                 {% endif %}
+
             </div>
 
             <div class="nome">
-                <strong>{{ item.produto.nome }}</strong>
-                <span>
-                    R$ {{ item.produto.preco|floatformat:2 }}
-                </span>
+
+                {% if item.tipo == 'kit' %}
+                    <strong>{{ item.kit.nome }}</strong>
+                    <small>Kit pronto</small>
+                    <span>R$ {{ item.kit.preco|floatformat:2 }}</span>
+                {% else %}
+                    <strong>{{ item.produto.nome }}</strong>
+                    <small>Doce individual</small>
+                    <span>R$ {{ item.produto.preco|floatformat:2 }}</span>
+                {% endif %}
+
             </div>
 
             <span>Quantidade: {{ item.quantidade }}</span>
@@ -50,6 +74,12 @@
             </span>
 
         </div>
+
+        {% empty %}
+
+        <p class="vazio">
+            Não há itens para confirmar.
+        </p>
 
         {% endfor %}
 

@@ -153,3 +153,49 @@
 .login-form .field button:hover {
     transform: translateY(-50%);
 }
+
+
+/* =====================================
+   AVISOS DE ERRO NOS CAMPOS DO CADASTRO
+===================================== */
+
+.login-form .field-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 6px;
+}
+
+.login-form .field.has-error input {
+    border-color: #c62828;
+    background-color: #fffafa;
+}
+
+.login-form .field.has-error input:focus {
+    border-color: #c62828;
+    box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.12);
+}
+
+/* Mini notificação abaixo do input */
+
+.login-form .field-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    width: 100%;
+    padding: 7px 11px;
+    border: 1px solid #f0b8b8;
+    border-radius: 7px;
+    background-color: #fff0f0;
+    color: #a32121;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    line-height: 1.5;
+    animation: aparecerAviso 0.2s ease;
+}
+
+.login-form .field-error span {
+    font-size: 13px;
+    font-weight: bold;
+    flex-shrink: 0;
+}

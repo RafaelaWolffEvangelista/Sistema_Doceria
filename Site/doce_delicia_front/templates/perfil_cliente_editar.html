@@ -1,0 +1,165 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Editar Minha Conta | Doce Delícia{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+
+<style>
+    .editar-perfil {
+        max-width: 600px;
+        margin: 35px auto;
+        padding: 30px;
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #ead8ce;
+        box-shadow: 0 4px 15px rgba(0,0,0,.05);
+    }
+
+    .editar-perfil h1 {
+        color: var(--color-primary);
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .editar-perfil .subtitulo {
+        text-align: center;
+        margin-bottom: 25px;
+        color: var(--color-text);
+    }
+
+    .campo-perfil {
+        margin-bottom: 18px;
+    }
+
+    .campo-perfil label {
+        display: block;
+        margin-bottom: 7px;
+        font-weight: 600;
+    }
+
+    .campo-perfil input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .erro-campo {
+        display: block;
+        color: #b3261e;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+
+    .erro-geral {
+        padding: 12px;
+        background: #fff0ee;
+        color: #b3261e;
+        border-radius: 8px;
+        margin-bottom: 18px;
+    }
+
+    .separador {
+        border: 0;
+        border-top: 1px solid #ead8ce;
+        margin: 25px 0;
+    }
+
+    .editar-acoes {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+    }
+
+    .editar-acoes .btn {
+        flex: 1;
+        text-align: center;
+    }
+
+    @media(max-width: 500px) {
+        .editar-perfil {
+            margin: 15px;
+            padding: 20px;
+        }
+
+        .editar-acoes {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="editar-perfil">
+
+    <h1>Editar Minha Conta ♡</h1>
+
+    <p class="subtitulo">
+        Atualize seus dados pessoais.
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="erro-geral">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+
+            {% if field.name == 'nova_senha' %}
+                <hr class="separador">
+
+                <h2 style="color: var(--color-primary); margin-bottom: 8px;">
+                    Alterar Senha
+                </h2>
+
+                <p style="font-size: 13px; margin-bottom: 18px;">
+                    Se não quiser alterar sua senha, deixe esse campo vazio.
+                </p>
+            {% endif %}
+
+            <div class="campo-perfil">
+
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+
+                {{ field }}
+
+                {% if field.help_text %}
+                    <small>{{ field.help_text }}</small>
+                {% endif %}
+
+                {% for error in field.errors %}
+                    <span class="erro-campo">{{ error }}</span>
+                {% endfor %}
+
+            </div>
+
+        {% endfor %}
+
+        <div class="editar-acoes">
+
+            <button type="submit" class="btn btn-primary">
+                Salvar Alterações
+            </button>
+
+            <a
+                href="{% url 'loja:perfil_ver' %}"
+                class="btn btn-outline"
+            >
+                Cancelar
+            </a>
+
+        </div>
+
+    </form>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,110 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Minha Conta | Doce Delícia{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+
+<style>
+    .perfil-cliente {
+        max-width: 600px;
+        margin: 35px auto;
+        padding: 30px;
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #ead8ce;
+        box-shadow: 0 4px 15px rgba(0,0,0,.05);
+    }
+
+    .perfil-cliente h1 {
+        color: var(--color-primary);
+        margin-bottom: 25px;
+        text-align: center;
+    }
+
+    .perfil-dado {
+        padding: 14px 0;
+        border-bottom: 1px solid #eee;
+        color: var(--color-text);
+    }
+
+    .perfil-dado strong {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--color-primary);
+    }
+
+    .perfil-acoes {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 25px;
+    }
+
+    .perfil-acoes .btn {
+        flex: 1;
+        text-align: center;
+    }
+
+    @media(max-width: 500px) {
+        .perfil-cliente {
+            margin: 15px;
+            padding: 20px;
+        }
+
+        .perfil-acoes {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="perfil-cliente">
+
+    <h1>Minha Conta ♡</h1>
+
+    <div class="perfil-dado">
+        <strong>Nome completo</strong>
+        {{ usuario.first_name }} {{ usuario.last_name }}
+    </div>
+
+    <div class="perfil-dado">
+        <strong>Nome de usuário</strong>
+        {{ usuario.username }}
+    </div>
+
+    <div class="perfil-dado">
+        <strong>E-mail</strong>
+        {{ usuario.email|default:"Não informado" }}
+    </div>
+
+    <div class="perfil-dado">
+        <strong>Telefone</strong>
+        {{ perfil.telefone|default:"Não informado" }}
+    </div>
+
+    <div class="perfil-acoes">
+
+        <a
+            href="{% url 'loja:perfil_editar' %}"
+            class="btn btn-primary"
+        >
+            Editar Perfil
+        </a>
+
+        <a
+            href="{% url 'loja:meus_pedidos' %}"
+            class="btn btn-outline"
+        >
+            Meus Pedidos
+        </a>
+
+    </div>
+
+</section>
+
+{% endblock %}

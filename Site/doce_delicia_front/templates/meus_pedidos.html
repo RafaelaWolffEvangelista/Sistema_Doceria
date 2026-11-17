@@ -42,33 +42,46 @@
 
                 {% if encomenda.status == 'Pendente' %}
                     <p>⏳ Sua encomenda está aguardando confirmação.</p>
-
                 {% elif encomenda.status == 'Em Producao' %}
                     <p>👩‍🍳 Sua encomenda está sendo preparada pela nossa equipe!</p>
-
                 {% elif encomenda.status == 'Pronto' %}
                     <p>🎂 Sua encomenda está pronta para entrega ou retirada!</p>
-
                 {% elif encomenda.status == 'Concluida' %}
                     <p>💖 Sua encomenda foi concluída. Obrigado pela preferência!</p>
-
                 {% elif encomenda.status == 'Cancelada' %}
                     <p>❌ Esta encomenda foi cancelada.</p>
                 {% endif %}
 
                 <div class="itens-pedido">
 
+                    <h3>Doces individuais</h3>
+
                     {% for item in encomenda.itemencomendaproduto_set.all %}
 
                         <div class="item">
-
                             <div class="nome">
                                 <strong>{{ item.produto.nome }}</strong>
                                 <span>Quantidade: {{ item.quantidade }}</span>
                             </div>
-
                         </div>
 
+                    {% empty %}
+                        <p>Nenhum doce individual neste pedido.</p>
+                    {% endfor %}
+
+                    <h3>Kits</h3>
+
+                    {% for item in encomenda.itemencomendakit_set.all %}
+
+                        <div class="item">
+                            <div class="nome">
+                                <strong>🎁 {{ item.kit.nome }}</strong>
+                                <span>Quantidade: {{ item.quantidade }}</span>
+                            </div>
+                        </div>
+
+                    {% empty %}
+                        <p>Nenhum kit neste pedido.</p>
                     {% endfor %}
 
                 </div>
@@ -118,4 +131,3 @@
 </section>
 
 {% endblock %}
-

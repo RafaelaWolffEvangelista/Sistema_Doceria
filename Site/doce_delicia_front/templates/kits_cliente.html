@@ -1,0 +1,289 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Nossos Kits | Doce Delícia{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
+
+<style>
+    .kits-intro {
+        margin-bottom: 25px;
+    }
+
+    .kits-intro h1 {
+        color: var(--color-primary);
+        margin-bottom: 8px;
+    }
+
+    .kits-intro p {
+        color: var(--color-text);
+    }
+
+    .filtros-kits {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .filtros-kits input,
+    .filtros-kits select {
+        padding: 10px;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        background: #fff;
+        min-width: 150px;
+    }
+
+    .kit-sem-imagem {
+        width: 100%;
+        height: 190px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 55px;
+        background: #F5EAE4;
+        border-radius: 10px;
+    }
+
+    .kits-vazios {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 35px 20px;
+        background: #fff;
+        border: 1px solid var(--color-border);
+        border-radius: 14px;
+    }
+
+    @media (max-width: 700px) {
+        .catalogo {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .side-nav {
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .wa-box {
+            display: none;
+        }
+
+        .lista-top {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .filtros-kits {
+            width: 100%;
+        }
+
+        .filtros-kits input,
+        .filtros-kits select {
+            flex: 1;
+            min-width: 0;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .prod .img-slot,
+        .kit-sem-imagem {
+            height: 140px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="catalogo">
+
+    <aside class="side">
+
+        <h3>Filtrar kits</h3>
+
+        <nav class="side-nav">
+            <a href="{% url 'loja:kits' %}" class="active">
+                Todos os kits
+            </a>
+        </nav>
+
+        <a href="{% url 'loja:catalogo' %}" class="wa-box">
+            <span>🍰</span>
+            <strong>Conheça nossos doces</strong>
+            <small>Veja também nossos produtos individuais!</small>
+        </a>
+
+    </aside>
+
+    <section class="lista">
+
+        <div class="kits-intro">
+            <h1>Nossos Kits Especiais 🎁</h1>
+            <p>
+                Combinações deliciosas preparadas com carinho
+                para deixar seus momentos ainda mais especiais!
+            </p>
+        </div>
+
+        <div class="lista-top">
+
+            <h2>Todos os Kits</h2>
+
+            <div class="filtros-kits">
+
+                <input
+                    type="search"
+                    id="buscaKit"
+                    placeholder="Pesquisar kit..."
+                    aria-label="Pesquisar kits"
+                >
+
+                <select id="ordemKits" aria-label="Ordenar kits">
+                    <option value="padrao">Ordenar por: Padrão</option>
+                    <option value="menor">Menor preço</option>
+                    <option value="maior">Maior preço</option>
+                </select>
+
+            </div>
+
+        </div>
+
+        <div class="grid" id="listaKits">
+
+            {% for kit in kits %}
+
+                <article
+                    class="prod reveal card-kit"
+                    data-nome="{{ kit.nome|lower }}"
+                    data-preco="{{ kit.preco|stringformat:'f' }}"
+                >
+
+                    <a
+                        href="{% url 'loja:detalhe_kit' kit.slug %}"
+                        class="img-slot"
+                    >
+                        {% if kit.imagem %}
+                            <img
+                                src="{{ kit.imagem.url }}"
+                                alt="{{ kit.nome }}"
+                            >
+                        {% else %}
+                            <div class="kit-sem-imagem">🎁</div>
+                        {% endif %}
+                    </a>
+
+                    <h4>{{ kit.nome }}</h4>
+
+                    <p>
+                        {{ kit.descricao|truncatewords:18 }}
+                    </p>
+
+                    <p class="preco">
+                        R$ {{ kit.preco|floatformat:2 }}
+                    </p>
+
+                    <a
+                        href="{% url 'loja:detalhe_kit' kit.slug %}"
+                        class="btn btn-primary btn-sm btn-block"
+                    >
+                        Ver kit
+                    </a>
+
+                </article>
+
+            {% empty %}
+
+                <div class="kits-vazios">
+                    <h2>🎁 Nenhum kit disponível no momento</h2>
+                    <p>Estamos preparando opções especiais para você!</p>
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+        <p
+            id="nenhumResultado"
+            style="display:none; text-align:center; padding:25px;"
+        >
+            Nenhum kit encontrado com essa pesquisa.
+        </p>
+
+    </section>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const busca = document.getElementById('buscaKit');
+    const ordem = document.getElementById('ordemKits');
+    const lista = document.getElementById('listaKits');
+    const mensagem = document.getElementById('nenhumResultado');
+
+    if (!busca || !ordem || !lista) {
+        return;
+    }
+
+    function filtrarEOrdenar() {
+
+        const pesquisa = busca.value.toLowerCase().trim();
+
+        const cards = Array.from(
+            lista.querySelectorAll('.card-kit')
+        );
+
+        cards.forEach(function (card) {
+
+            const nome = card.dataset.nome || '';
+
+            card.style.display = nome.includes(pesquisa)
+                ? ''
+                : 'none';
+
+        });
+
+        const visiveis = cards.filter(function (card) {
+            return card.style.display !== 'none';
+        });
+
+        if (ordem.value === 'menor') {
+            visiveis.sort(function (a, b) {
+                return parseFloat(a.dataset.preco) -
+                       parseFloat(b.dataset.preco);
+            });
+        }
+
+        if (ordem.value === 'maior') {
+            visiveis.sort(function (a, b) {
+                return parseFloat(b.dataset.preco) -
+                       parseFloat(a.dataset.preco);
+            });
+        }
+
+        visiveis.forEach(function (card) {
+            lista.appendChild(card);
+        });
+
+        mensagem.style.display =
+            visiveis.length === 0 && cards.length > 0
+                ? 'block'
+                : 'none';
+    }
+
+    busca.addEventListener('input', filtrarEOrdenar);
+    ordem.addEventListener('change', filtrarEOrdenar);
+
+});
+</script>
+
+{% endblock %}
